@@ -1,6 +1,6 @@
 # FullyStackedHandcraftedHaven
 
-WDD 340 Team Project
+WDD 430 Team Project
 Members:
 JT Pyle
 Clarence Ahiabor
