@@ -5,6 +5,7 @@ Members:
 JT Pyle
 Clarence Ahiabor
 Tadiwanashe Divine Mphame
+Okpewo Damilola 
 
 CSS Framework:
 Tailwind
