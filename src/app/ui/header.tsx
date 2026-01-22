@@ -9,11 +9,13 @@ export function Header() {
         </Link>
 
         {/* hamburger menu - will add functionality later */}
+        <div itemID="Hamburger_Menu">
         <button className="flex flex-col gap-1.5 p-2">
           <span className="block w-6 h-0.5 bg-white"></span>
           <span className="block w-6 h-0.5 bg-white"></span>
           <span className="block w-6 h-0.5 bg-white"></span>
         </button>
+        </div>
       </div>
     </header>
   );
