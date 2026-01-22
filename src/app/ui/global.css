@@ -1,6 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Color palette from coolors.co/0d1821-344966-e6aace */
+@theme {
+  --color-primary: #0d1821;
+  --color-secondary: #344966;
+  --color-accent: #e6aace;
+}
 
 input[type='number'] {
   -moz-appearance: textfield;
