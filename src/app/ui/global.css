@@ -16,3 +16,11 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.border{
+  border: 2px solid;
+}
+header{
+  padding: 10px;
+  
+}
