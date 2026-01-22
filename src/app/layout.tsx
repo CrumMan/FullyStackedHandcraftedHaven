@@ -1,12 +1,12 @@
-import '@/app/ui/global.css';
-import { montserrat } from '@/app/ui/fonts';
-import { Metadata } from 'next';
-import { Header } from './ui/header';
-import { Footer } from './ui/footer';
+import "@/app/ui/global.css";
+import { montserrat } from "@/app/ui/fonts";
+import { Metadata } from "next";
+import { Header } from "./ui/header";
+import { Footer } from "./ui/footer";
 
 export const metadata: Metadata = {
-  title: "Fully Stacked",
-  description: "Fully Stacked Homepage",
+  title: "Handcrafted Haven",
+  description: "Discover unique handmade products from talented artisans",
 };
 
 export default function RootLayout({
@@ -16,7 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${montserrat.className} antialiased`}>
+      <body
+        className={`${montserrat.className} antialiased min-h-screen flex flex-col`}
+      >
         <Header />
         {children}
         <Footer />

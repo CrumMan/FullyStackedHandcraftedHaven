@@ -6,6 +6,7 @@ JT Pyle
 Clarence Ahiabor
 Tadiwanashe Divine Mphame
 Okpewo Damilola 
+Mac-Donald Bonsu Osei
 
 CSS Framework:
 Tailwind
