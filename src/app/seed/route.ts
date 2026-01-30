@@ -90,6 +90,9 @@ export async function GET() {
     const result = await sql.begin((sql) => [
       dropSeededAccount(),
       seedAccount(),
+    ]);
+    const newResult = await sql.begin((sql) => [
+      
       dropSeededProducts(),
       seedProducts(),
     ]);
