@@ -1,7 +1,14 @@
 import bcrypt from 'bcrypt';
 import postgres from 'postgres';
-import { users } from '../lib/placeholder-data'
-const sql = postgres(process.env.POSTGRES_URL!, {ssl: 'require'});
+import { users, listings } from '../lib/placeholder-data';
+
+if (!process.env.POSTGRES_URL) {
+  throw new Error("POSTGRES_URL is not defined");
+}
+
+const sql = postgres(process.env.POSTGRES_URL, {
+  ssl: process.env.NODE_ENV === "production" ? "require" : false,
+});
 
 async function seedUsers() {
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
@@ -31,10 +38,53 @@ async function seedUsers() {
   return insertedUsers;
 }
 
+async function seedListings() {
+  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS listings (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      artist_id UUID NOT NULL,
+      description TEXT NOT NULL,
+      quantity INTEGER NOT NULL,
+      price NUMERIC(10,2) NOT NULL,
+      keywords TEXT[],
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+  `;
+
+  const insertedListings = await Promise.all(
+    listings.map((listing) => {
+      return sql`
+        INSERT INTO listings (
+          id,
+          artist_id,
+          description,
+          quantity,
+          price,
+          keywords
+        )
+        VALUES (
+          ${listing.id},
+          ${listing.artist_id},
+          ${listing.description},
+          ${listing.quantity},
+          ${listing.price},
+          ${listing.keywords}
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+    })
+  );
+
+  return insertedListings;
+}
+
 export async function GET() {
   try {
-    const result = await sql.begin((sql) => [
+    await sql.begin(() => [
       seedUsers(),
+      seedListings(),
     ]);
 
     return Response.json({ message: 'Database seeded successfully' });
