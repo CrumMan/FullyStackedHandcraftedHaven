@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import postgres from 'postgres';
 import { users, products } from '../lib/placeholder-data'
 const sql = postgres(process.env.POSTGRES_URL!, {ssl: 'require'});
