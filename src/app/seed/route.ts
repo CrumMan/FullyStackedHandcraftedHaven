@@ -88,12 +88,12 @@ export async function GET() {
   try {
     console.log("POSTGRES_URL:", process.env.POSTGRES_URL);
     const result = await sql.begin((sql) => [
-      dropSeededAccount(),
+      //dropSeededAccount(),
       seedAccount(),
     ]);
     const newResult = await sql.begin((sql) => [
       
-      dropSeededProducts(),
+      //dropSeededProducts(),
       seedProducts(),
     ]);
 
