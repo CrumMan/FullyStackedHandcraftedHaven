@@ -1,32 +1,6 @@
 import Link from "next/link";
-
-// placeholder data - will be replaced with database fetch
-const product = {
-  id: "1",
-  name: "Handmade Vase",
-  price: 45.99,
-  seller: "Jane Artisan",
-  rating: 4.5,
-  description:
-    "A beautiful handcrafted ceramic vase, perfect for displaying fresh flowers or as a standalone decorative piece. Each piece is unique and made with care.",
-  image: "/placeholder.jpg",
-};
-
-// placeholder reviews
-const reviews = [
-  {
-    id: "1",
-    author: "Customer A",
-    rating: 5,
-    comment: "Beautiful craftsmanship! Exactly as described.",
-  },
-  {
-    id: "2",
-    author: "Customer B",
-    rating: 4,
-    comment: "Great quality, shipping was fast.",
-  },
-];
+import { getProductById } from "../../lib/data";
+import { notFound } from "next/navigation";
 
 export default async function ProductPage({
   params,
@@ -34,6 +8,27 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const product = await getProductById(id);
+
+  if (!product) {
+    notFound();
+  }
+
+  // placeholder reviews for now
+  const reviews = [
+    {
+      id: "1",
+      author: "Customer A",
+      rating: 5,
+      comment: "Beautiful craftsmanship! Exactly as described.",
+    },
+    {
+      id: "2",
+      author: "Customer B",
+      rating: 4,
+      comment: "Great quality, shipping was fast.",
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-white">
@@ -55,11 +50,11 @@ export default async function ProductPage({
               </p>
               <h1 className="text-2xl font-bold mb-1">{product.name}</h1>
               <p className="text-sm text-primary/60 mb-4">
-                Rating: {product.rating}/5
+                {product.quantity} in stock
               </p>
 
               <p className="text-xl font-semibold mb-4">
-                ${product.price.toFixed(2)}
+                ${Number(product.price).toFixed(2)}
               </p>
 
               <div className="mb-6">

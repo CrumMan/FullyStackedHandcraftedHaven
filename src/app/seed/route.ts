@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import postgres from 'postgres';
 import { users, products } from '../lib/placeholder-data'
 const sql = postgres(process.env.POSTGRES_URL!, {ssl: 'require'});
@@ -86,16 +86,13 @@ async function seedAccount() {
 
 export async function GET() {
   try {
-    console.log("POSTGRES_URL:", process.env.POSTGRES_URL);
-    const result = await sql.begin((sql) => [
-      dropSeededAccount(),
-      seedAccount(),
-    ]);
-    const newResult = await sql.begin((sql) => [
-      
-      dropSeededProducts(),
-      seedProducts(),
-    ]);
+    // drop tables in correct order (products first due to foreign key)
+    await dropSeededProducts();
+    await dropSeededAccount();
+    
+    // seed tables in correct order (account first, then products)
+    await seedAccount();
+    await seedProducts();
 
     return Response.json({ message: 'Database seeded successfully' });
   } catch (error) {
