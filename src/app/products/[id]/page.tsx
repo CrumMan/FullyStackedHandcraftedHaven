@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { getProductById } from "../../lib/data";
 import { notFound } from "next/navigation";
+import postgres from "postgres";
+
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
 
 export default async function ProductPage({
   params,
@@ -13,22 +17,50 @@ export default async function ProductPage({
   if (!product) {
     notFound();
   }
+// export default async function Home() {
+//   const rows = await sql`
+//     SELECT
+//       p.id,
+//       p.name,
+//       p.price,
+//       p.quantity,
+//       p.description,
+//       p.productimg,
+//       a.name as "sellerName"
+//     FROM products p
+//     JOIN account a ON a.id = p.userid
+//     ORDER BY p.name ASC
+//     LIMIT 6;
+//   `;
+
+  const reviews = await sql `
+   SELECT
+    r.id,
+    r.userId,
+    r.productId,
+    r.author,
+    r.rating,
+    r.comment
+  FROM reviews r
+  where (r.productId = ${id});
+  `;
+  
 
   // placeholder reviews for now
-  const reviews = [
-    {
-      id: "1",
-      author: "Customer A",
-      rating: 5,
-      comment: "Beautiful craftsmanship! Exactly as described.",
-    },
-    {
-      id: "2",
-      author: "Customer B",
-      rating: 4,
-      comment: "Great quality, shipping was fast.",
-    },
-  ];
+  // const review = [
+  //   {
+  //     id: "1",
+  //     author: "Customer A",
+  //     rating: 5,
+  //     comment: "Beautiful craftsmanship! Exactly as described.",
+  //   },
+  //   {
+  //     id: "2",
+  //     author: "Customer B",
+  //     rating: 4,
+  //     comment: "Great quality, shipping was fast.",
+  //   },
+  // ];
 
   return (
     <main className="min-h-screen bg-white">
