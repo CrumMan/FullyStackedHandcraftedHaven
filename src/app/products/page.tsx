@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { getProducts } from "../lib/data";
+import { getProducts } from "@/app/lib/data";
+
+function normalizeImg(path: string | null | undefined) {
+  const cleaned = (path ?? "").replace("@/public", "").trim();
+  if (!cleaned) return "/placeholder-product.jpg";
+  if (cleaned.startsWith("http")) return cleaned;
+  if (cleaned.startsWith("/")) return cleaned;
+  return `/${cleaned}`;
+}
 
 export default async function ProductsPage() {
   const products = await getProducts();
@@ -19,21 +27,34 @@ export default async function ProductsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {products.map((product) => (
-                <Link href={`/products/${product.id}`} key={product.id}>
-                  <div className="bg-secondary text-white rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
-                    {/* product image placeholder */}
-                    <div className="h-48 bg-secondary flex items-center justify-center">
-                      <span className="text-white/50">Product Image</span>
-                    </div>
+                <Link
+                  key={product.id}
+                  href={`/products/${product.id}`}
+                  className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition bg-white"
+                >
+                  <div className="relative w-full h-56 bg-gray-100 overflow-hidden group">
+                    <img
+                      src={normalizeImg(product.productImg)}
+                      alt={product.name ?? "Product"}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent"></div>
+                  </div>
 
-                    {/* product info */}
-                    <div className="p-4 text-center">
-                      <p className="font-semibold">{product.name}</p>
-                      <p className="text-white/80">
-                        ${Number(product.price).toFixed(2)}
-                      </p>
-                      <p className="text-sm text-white/60">{product.seller}</p>
-                    </div>
+                  <div className="p-4 space-y-2">
+                    <h3 className="font-semibold text-primary text-lg">
+                      {product.name}
+                    </h3>
+                    <p className="text-secondary font-bold">
+                      ${Number(product.price).toFixed(2)}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Seller: {product.seller}
+                    </p>
+                    <p className="text-sm text-gray-700 line-clamp-2">
+                      {product.description}
+                    </p>
                   </div>
                 </Link>
               ))}

@@ -12,9 +12,9 @@ export async function getProducts() {
         p.price,
         p.quantity,
         p.description,
-        p.productImg,
-        a.name as seller,
-        a.id as sellerId
+        p.productImg as "productImg",
+        a.name as "seller",
+        a.id as "sellerId"
       FROM products p
       JOIN account a ON p.userId = a.id
     `;
@@ -35,9 +35,9 @@ export async function getProductById(id: string) {
         p.price,
         p.quantity,
         p.description,
-        p.productImg,
-        a.name as seller,
-        a.id as sellerId
+        p.productImg as "productImg",
+        a.name as "seller",
+        a.id as "sellerId"
       FROM products p
       JOIN account a ON p.userId = a.id
       WHERE p.id = ${id}
@@ -46,5 +46,74 @@ export async function getProductById(id: string) {
   } catch (error) {
     console.error("Database Error:", error);
     return null;
+  }
+}
+
+// fetch seller by id
+export async function getSellerById(id: string) {
+  try {
+    const sellers = await sql`
+      SELECT id, username, name, email, role, bio, userPhoto, approved
+      FROM account
+      WHERE id = ${id}
+    `;
+    return sellers[0] || null;
+  } catch (error) {
+    console.error("Database Error:", error);
+    return null;
+  }
+}
+
+// fetch products by seller id
+export async function getProductsBySeller(sellerId: string) {
+  try {
+    const products = await sql`
+      SELECT 
+        p.id,
+        p.name,
+        p.price,
+        p.quantity,
+        p.description,
+        p.productImg as "productImg",
+        a.name as "seller",
+        a.id as "sellerId"
+      FROM products p
+      JOIN account a ON p.userId = a.id
+      WHERE p.userId = ${sellerId}
+    `;
+    return products;
+  } catch (error) {
+    console.error("Database Error:", error);
+    return [];
+  }
+}
+
+// fetch user by email (for login)
+export async function getUserByEmail(email: string) {
+  try {
+    const users = await sql`
+      SELECT id, username, name, email, password, role, bio, userPhoto, approved
+      FROM account
+      WHERE email = ${email}
+    `;
+    return users[0] || null;
+  } catch (error) {
+    console.error("Database Error:", error);
+    return null;
+  }
+}
+
+// fetch all sellers pending approval (for admin)
+export async function getPendingSellers() {
+  try {
+    const sellers = await sql`
+      SELECT id, username, name, email, role, bio, userPhoto, approved, createdAt
+      FROM account
+      WHERE role = 'Seller' AND approved = false
+    `;
+    return sellers;
+  } catch (error) {
+    console.error("Database Error:", error);
+    return [];
   }
 }

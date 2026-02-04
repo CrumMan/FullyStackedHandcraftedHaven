@@ -1,45 +1,21 @@
 import Link from "next/link";
-import Image from "next/image";
-import postgres from "postgres";
+import { getProducts } from "@/app/lib/data.ts";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
-// Fix DB image paths
-function normalizeImg(path: string | null) {
+function normalizeImg(path: string | null | undefined) {
   const cleaned = (path ?? "").replace("@/public", "").trim();
-
-  if (!cleaned) return "/placeholder.jpg";
+  if (!cleaned) return "/placeholder-product.jpg";
   if (cleaned.startsWith("http")) return cleaned;
   if (cleaned.startsWith("/")) return cleaned;
-
   return `/${cleaned}`;
 }
 
 export default async function Home() {
-  const rows = await sql`
-    SELECT
-      p.id,
-      p.name,
-      p.price,
-      p.quantity,
-      p.description,
-      p.productimg,
-      a.name as "sellerName"
-    FROM products p
-    JOIN account a ON a.id = p.userid
-    ORDER BY p.name ASC
-    LIMIT 6;
-  `;
-
-  const featured = rows.map((p: any) => ({
-    ...p,
-    productImg: normalizeImg(p.productimg),
-  }));
+  const products = await getProducts();
+  const featured = products.slice(0, 6);
 
   return (
     <main className="min-h-screen bg-white">
-
-      {/* HERO */}
+      {/* hero section */}
       <section className="p-8">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold text-primary text-center mb-6">
@@ -61,10 +37,10 @@ export default async function Home() {
                 </Link>
 
                 <Link
-                  href="/products"
+                  href="/register"
                   className="border border-white px-4 py-2 rounded-md font-semibold hover:bg-white hover:text-secondary"
                 >
-                  View featured items
+                  Join as Seller
                 </Link>
               </div>
 
@@ -76,7 +52,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* FEATURED */}
+      {/* featured items */}
       <section className="p-8">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-lg font-semibold text-primary text-center mb-6">
@@ -84,61 +60,47 @@ export default async function Home() {
           </h2>
 
           {featured.length === 0 ? (
-            <p className="text-center">No products found.</p>
+            <p className="text-center text-primary/60">
+              No products found. Check back soon!
+            </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-              {featured.map((p: any) => (
+              {featured.map((product) => (
                 <Link
-                  key={p.id}
-                  href={`/products/${p.id}`}
+                  key={product.id}
+                  href={`/products/${product.id}`}
                   className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition bg-white"
                 >
-                {/* Image */}
-                <div className="relative w-full h-56 bg-gray-100 overflow-hidden group">
+                  <div className="relative w-full h-56 bg-gray-100 overflow-hidden group">
+                    <img
+                      src={normalizeImg(product.productImg)}
+                      alt={product.name ?? "Product"}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent"></div>
+                  </div>
 
-                  <Image
-                    src={p.productImg}
-                    alt={p.name}
-                    fill
-                    className="
-                      object-cover
-                      transition-transform
-                      duration-500
-                      group-hover:scale-110
-                    "
-                  />
-
-                  {/* subtle gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                </div>
-                
-                  {/* Content */}
                   <div className="p-4 space-y-2">
                     <h3 className="font-semibold text-primary text-lg">
-                      {p.name}
+                      {product.name}
                     </h3>
-
                     <p className="text-secondary font-bold">
-                      ${Number(p.price).toFixed(2)}
+                      ${Number(product.price).toFixed(2)}
                     </p>
-
                     <p className="text-sm text-gray-600">
-                      Seller: {p.sellerName}
+                      Seller: {product.seller}
                     </p>
-
                     <p className="text-sm text-gray-700 line-clamp-2">
-                      {p.description}
+                      {product.description}
                     </p>
                   </div>
                 </Link>
               ))}
-
             </div>
           )}
         </div>
       </section>
-
     </main>
   );
 }
