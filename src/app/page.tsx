@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getProducts } from "@/app/lib/data.ts";
+import { getProducts } from "@/app/lib/data";
 
 function normalizeImg(path: string | null | undefined) {
   const cleaned = (path ?? "").replace("@/public", "").trim();

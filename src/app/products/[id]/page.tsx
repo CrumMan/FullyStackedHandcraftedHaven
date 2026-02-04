@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getProductById } from "@/app/lib/data.ts";
+import { getProductById } from "@/app/lib/data";
 import { notFound } from "next/navigation";
 
 function normalizeImg(path: string | null | undefined) {
