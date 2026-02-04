@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import postgres from 'postgres';
-import { users, products } from '../lib/placeholder-data'
+import { users, products, reviews } from '../lib/placeholder-data'
+import { error } from 'console';
 const sql = postgres(process.env.POSTGRES_URL!, {ssl: 'require'});
 async function dropSeededProducts() {
   await sql`DROP TABLE IF EXISTS products`
@@ -33,6 +34,46 @@ CREATE TABLE IF NOT EXISTS products (
     })
   )
   return insertedProducts;
+}
+
+async function seedReviews(){
+ await sql `
+ CREATE TABLE IF NOT EXISTS reviews(
+ id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+
+ userId UUID NOT NULL,
+ author VARCHAR(20) NOT NULL,
+ productId UUID NOT NULL,
+
+ rating INT CHECK (rating between 1 and 5) NOT NULL,
+ comment TEXT,
+
+  CONSTRAINT fk_user
+    FOREIGN KEY (userId)
+    REFERENCES account(id)
+    ON DELETE CASCADE,
+
+
+  CONSTRAINT fk_product
+    FOREIGN KEY (productId)
+    REFERENCES products(id)
+    ON DELETE CASCADE
+ );
+ ` 
+  const insertedReviews = await Promise.all(
+    reviews.map(async (review) =>{
+      const authorResult = await sql `
+      select name from account where (account.id = ${review.userId});
+      `
+      const author = authorResult[0].name
+      return sql `
+      INSERT INTO reviews( id, userId, productId, author, rating, comment)
+      VALUES (${review.id},${review.userId}, ${review.productId}, ${author}, ${review.rating}, ${review.comment})
+      ON CONFLICT (id) DO NOTHING;
+    `
+    })
+  )
+  return insertedReviews;
 }
 
 async function dropSeededAccount(){
@@ -86,20 +127,18 @@ async function seedAccount() {
 
 export async function GET() {
   try {
-    console.log("POSTGRES_URL:", process.env.POSTGRES_URL);
-    const result = await sql.begin((sql) => [
-      //dropSeededAccount(),
-      // seedAccount(),
-    ]);
-    const newResult = await sql.begin((sql) => [
+    console.log("POSTGRES_URL:", process.env.POSTGRES_URL);  
+      // await dropSeededAccount();
+      // await seedAccount();
       
-      //dropSeededProducts(),
-      // seedProducts(),
-    ]);
+      // await dropSeededProducts();
+      // await seedProducts();
+
+      // await seedReviews();
 
     return Response.json({ message: 'Database seeded successfully' });
-  } catch (error) {
+    } catch (error) {
     console.log(error)
     return Response.json({ error }, { status: 500 });
-  }
+    }
 }
