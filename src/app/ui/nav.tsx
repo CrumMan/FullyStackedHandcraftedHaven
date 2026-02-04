@@ -6,47 +6,62 @@ import Link from "next/link";
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const links = [
+    { href: "/", label: "Home" },
+    { href: "/products", label: "Products" },
+    { href: "/login", label: "Login" },
+    { href: "/register", label: "Register" },
+  ];
+
   return (
     <>
-      {/* Hamburger Button */}
+      {/* Desktop nav */}
+      <nav className="hidden md:flex items-center gap-6 ml-auto">
+        {links.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="text-sm font-medium text-white/95 hover:text-white"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Mobile hamburger */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
         aria-label="Toggle menu"
-        className="absolute right-4 top-4 w-8 h-8 z-50"
+        aria-expanded={isOpen}
+        className="md:hidden ml-auto h-10 w-10 grid place-items-center"
       >
-        <span className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? "rotate-45 top-1/2" : "top-2"}`} />
-        <span className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-white transition-opacity duration-300 ${isOpen ? "opacity-0 top-1/2" : "top-1/2"}`} />
-        <span className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? "-rotate-45 top-1/2" : "top-6"}`} />
+        {isOpen ? (
+          <span className="text-2xl leading-none">×</span>
+        ) : (
+          <div className="flex flex-col gap-1">
+            <span className="block w-6 h-0.5 bg-white" />
+            <span className="block w-6 h-0.5 bg-white" />
+            <span className="block w-6 h-0.5 bg-white" />
+          </div>
+        )}
       </button>
 
-      {/* Menu */}
+      {/* Mobile expanded menu (extends header) */}
       {isOpen && (
-        <nav className="w-full flex gap-8 mt-2 items-center justify-center bg-secondary overflow-hidden transition-all duration-300 opacity-100 max-h-20">
-
-          <Link
-            href="/"
-            onClick={() => setIsOpen(false)}
-            className="text-xl text-white hover:text-gray-300 transition-colors"
-          >
-            Home
-          </Link>
-
-          <Link
-            href="/products"
-            onClick={() => setIsOpen(false)}
-            className="text-xl text-white hover:text-gray-300 transition-colors"
-          >
-            Products
-          </Link>
-
-          <Link
-            href="/login"
-            onClick={() => setIsOpen(false)}
-            className="text-xl text-white hover:text-gray-300 transition-colors"
-          >
-            Login
-          </Link>
-
+        <nav className="md:hidden w-full border-t border-white/15 pt-3">
+          <div className="flex flex-col gap-3">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className="text-white/95 hover:text-white text-sm font-medium"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </nav>
       )}
     </>
