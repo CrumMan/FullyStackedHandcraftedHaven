@@ -1,7 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { register, getCurrentUser } from "@/app/lib/actions";
+import { register, getCurrentUser, updateAccount } from "@/app/lib/actions";
 
 export default function EditForm(){
     const router = useRouter();
@@ -45,18 +45,13 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
     setError("");
 
     const formDataObj = new FormData(e.currentTarget)
-    const result = await register(formDataObj) 
+    const result = await updateAccount(formDataObj) 
 
     if (result.error) {
       setError(result.error);
       setLoading(false);
     } else {
-      const role = formDataObj.get("role");
-      if (role === "Seller") {
-        router.push("/login?message=pending");
-      } else {
-        router.push("/login?message=success");
-      }
+      router.push("/account?message=updated")
     }
   }
   if (!user) {
@@ -110,20 +105,6 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-primary mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                minLength={6}
-                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
-              />
-            </div>
-
-            <div>
               <label htmlFor="role" className="block text-sm font-medium text-primary mb-1">
                 Account Type
               </label>
@@ -162,7 +143,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
               disabled={loading}
               className="w-full bg-secondary text-white py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {loading ? "Creating Account..." : "Register"}
+              {loading ? "Editing..." : "Edit Account"}
             </button>
           </form>
     )

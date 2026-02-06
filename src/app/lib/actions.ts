@@ -93,6 +93,8 @@ export async function logout() {
   redirect("/");
 }
 
+
+
 export async function getCurrentUser() {
   const cookieStore = await cookies();
   const userId = cookieStore.get("userId")?.value;
@@ -112,6 +114,32 @@ export async function getCurrentUser() {
     console.error("Get user error:", error);
     return null;
   }
+}
+
+export async function updateAccount(formData: FormData){
+  const user = await getCurrentUser();
+  let userId
+  if (user != null){
+    userId = user.id;
+  }
+ if (user == null){
+  return{error: 'user not authenticated'};
+ }
+  
+  try{
+    await sql`
+    UPDATE account
+    SET name = ${formData.get("name") as string}, 
+    username = ${formData.get("username") as string},
+    email = ${formData.get("email") as string},
+    bio = ${formData.get("bio") as string}
+    where id = ${userId}
+    `
+    return {success: true}
+  } catch(error){
+    return{error: "Failed to update account"};
+  }
+
 }
 
 export async function approveSeller(sellerId: string) {
