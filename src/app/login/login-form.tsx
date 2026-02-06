@@ -26,7 +26,7 @@ export function LoginForm() {
       if (result.user.role === "Admin") {
         router.push("/admin");
       } else {
-        router.push("/");
+        router.push("/account");
       }
     }
   }
