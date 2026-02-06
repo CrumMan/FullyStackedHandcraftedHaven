@@ -16,11 +16,12 @@ export default function RegisterPage() {
 
     const result = await register(formData);
 
-    if (result.error) {
+    if (result?.error) {
       setError(result.error);
       setLoading(false);
     } else {
       const role = formData.get("role");
+      // Handle the redirect logic based on the created account role
       if (role === "Seller") {
         router.push("/login?message=pending");
       } else {
@@ -43,11 +44,12 @@ export default function RegisterPage() {
                 Username
               </label>
               <input
+                disabled={loading}
                 type="text"
                 id="username"
                 name="username"
                 required
-                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
+                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary disabled:bg-gray-50 disabled:text-gray-500"
               />
             </div>
 
@@ -56,11 +58,12 @@ export default function RegisterPage() {
                 Full Name
               </label>
               <input
+                disabled={loading}
                 type="text"
                 id="name"
                 name="name"
                 required
-                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
+                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary disabled:bg-gray-50 disabled:text-gray-500"
               />
             </div>
 
@@ -69,11 +72,12 @@ export default function RegisterPage() {
                 Email
               </label>
               <input
+                disabled={loading}
                 type="email"
                 id="email"
                 name="email"
                 required
-                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
+                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary disabled:bg-gray-50 disabled:text-gray-500"
               />
             </div>
 
@@ -82,12 +86,13 @@ export default function RegisterPage() {
                 Password
               </label>
               <input
+                disabled={loading}
                 type="password"
                 id="password"
                 name="password"
                 required
                 minLength={6}
-                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
+                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary disabled:bg-gray-50 disabled:text-gray-500"
               />
             </div>
 
@@ -96,10 +101,11 @@ export default function RegisterPage() {
                 Account Type
               </label>
               <select
+                disabled={loading}
                 id="role"
                 name="role"
                 required
-                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
+                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary disabled:bg-gray-50 disabled:text-gray-500"
               >
                 <option value="Buyer">Buyer</option>
                 <option value="Seller">Seller (requires approval)</option>
@@ -111,22 +117,23 @@ export default function RegisterPage() {
                 Bio (optional)
               </label>
               <textarea
+                disabled={loading}
                 id="bio"
                 name="bio"
                 rows={3}
-                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
+                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="Tell us about yourself..."
               />
             </div>
 
             {error && (
-              <p className="text-red-600 text-sm">{error}</p>
+              <p className="text-red-600 text-sm font-medium">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-secondary text-white py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full bg-secondary text-white py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Creating Account..." : "Register"}
             </button>

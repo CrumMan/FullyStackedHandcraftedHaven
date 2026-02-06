@@ -1,9 +1,22 @@
 import postgres from "postgres";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+// 1. Safe connection setup
+const connectionString = process.env.POSTGRES_URL;
+const sql = postgres(connectionString || "", { 
+  ssl: "require",
+  connect_timeout: 1 // Prevents the app from hanging if the DB is unreachable
+});
+
+// Helper to check if DB is connected
+const isDbConnected = !!connectionString;
 
 // fetch all products with seller info
 export async function getProducts() {
+  if (!isDbConnected) {
+    console.warn("⚠️ Database URL missing. Returning empty product list.");
+    return [];
+  }
+
   try {
     const products = await sql`
       SELECT 
@@ -27,6 +40,7 @@ export async function getProducts() {
 
 // fetch single product by id
 export async function getProductById(id: string) {
+  if (!isDbConnected) return null;
   try {
     const products = await sql`
       SELECT 
@@ -51,6 +65,7 @@ export async function getProductById(id: string) {
 
 // fetch seller by id
 export async function getSellerById(id: string) {
+  if (!isDbConnected) return null;
   try {
     const sellers = await sql`
       SELECT id, username, name, email, role, bio, userPhoto, approved
@@ -66,6 +81,7 @@ export async function getSellerById(id: string) {
 
 // fetch products by seller id
 export async function getProductsBySeller(sellerId: string) {
+  if (!isDbConnected) return [];
   try {
     const products = await sql`
       SELECT 
@@ -90,6 +106,7 @@ export async function getProductsBySeller(sellerId: string) {
 
 // fetch user by email (for login)
 export async function getUserByEmail(email: string) {
+  if (!isDbConnected) return null;
   try {
     const users = await sql`
       SELECT id, username, name, email, password, role, bio, userPhoto, approved
@@ -105,6 +122,7 @@ export async function getUserByEmail(email: string) {
 
 // fetch all sellers pending approval (for admin)
 export async function getPendingSellers() {
+  if (!isDbConnected) return [];
   try {
     const sellers = await sql`
       SELECT id, username, name, email, role, bio, userPhoto, approved, createdAt

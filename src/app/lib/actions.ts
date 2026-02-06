@@ -5,7 +5,15 @@ import postgres from "postgres";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+/** * DATABASE CONNECTION
+ * This will look for the URL in your .env.local file.
+ * While you are not linked to the Vercel Team, this will be undefined.
+ */
+const sql = postgres(process.env.POSTGRES_URL || "", { 
+  ssl: "require",
+  // We set a short timeout so it doesn't hang your app while testing locally
+  connect_timeout: 1 
+});
 
 export async function register(formData: FormData) {
   const username = formData.get("username") as string;
@@ -15,11 +23,15 @@ export async function register(formData: FormData) {
   const role = formData.get("role") as string;
   const bio = formData.get("bio") as string;
 
+  // 1. Basic Validation (Works locally!)
   if (!username || !name || !email || !password || !role) {
     return { error: "All fields are required" };
   }
 
   try {
+    // --- START DATABASE SECTION ---
+    // Once you are linked to the Vercel Team, uncomment the code below:
+    /*
     const existingUser = await sql`
       SELECT id FROM account WHERE email = ${email} OR username = ${username}
     `;
@@ -35,11 +47,20 @@ export async function register(formData: FormData) {
       INSERT INTO account (username, name, email, password, role, bio, approved)
       VALUES (${username}, ${name}, ${email}, ${hashedPassword}, ${role}, ${bio || ""}, ${approved})
     `;
+    */
+    // --- END DATABASE SECTION ---
+
+    // --- MOCK LOGIC FOR TESTING ---
+    // This simulates the database taking 1.5 seconds to save the user
+    console.log("Mocking registration for:", { username, email, role });
+    await new Promise((resolve) => setTimeout(resolve, 1500)); 
 
     return { success: true };
+    // ------------------------------
+
   } catch (error) {
     console.error("Registration error:", error);
-    return { error: "Failed to create account" };
+    return { error: "Database connection missing. Push to your branch for Team Lead to test." };
   }
 }
 
@@ -49,6 +70,12 @@ export async function login(formData: FormData) {
 
   if (!email || !password) {
     return { error: "Email and password are required" };
+  }
+
+  // 1. Safety Check: If DB is not connected, don't try to query
+  if (!process.env.POSTGRES_URL) {
+    console.warn("⚠️ Login attempted without Database connection.");
+    return { error: "Login is currently disabled (Database not connected)." };
   }
 
   try {
@@ -78,15 +105,15 @@ export async function login(formData: FormData) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7,
+      path: '/',
     });
 
     return { success: true, user: { id: user.id, name: user.name, role: user.role } };
   } catch (error) {
     console.error("Login error:", error);
-    return { error: "Login failed" };
+    return { error: "Login failed due to database connection issues." };
   }
 }
-
 export async function logout() {
   const cookieStore = await cookies();
   cookieStore.delete("userId");
