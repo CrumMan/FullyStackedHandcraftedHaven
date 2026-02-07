@@ -142,7 +142,7 @@ export async function GET() {
       // await dropSeededProducts();
       // await seedProducts();
 
-      await seedReviews();
+      // await seedReviews();
       // await dropSeededReviews();
     return Response.json({ message: 'Database seeded successfully' });
     } catch (error) {
