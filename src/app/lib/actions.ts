@@ -78,7 +78,8 @@ export async function login(formData: FormData) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7,
-    });
+    }
+  );
 
     return { success: true, user: { id: user.id, name: user.name, role: user.role } };
   } catch (error) {
@@ -90,7 +91,6 @@ export async function login(formData: FormData) {
 export async function logout() {
   const cookieStore = await cookies();
   cookieStore.delete("userId");
-  redirect("/");
 }
 
 
@@ -153,5 +153,38 @@ export async function approveSeller(sellerId: string) {
   } catch (error) {
     console.error("Approve seller error:", error);
     return { error: "Failed to approve seller" };
+  }
+}
+
+export async function getProductsByUserId(){
+  try{
+    const user = await getCurrentUser()
+    if (!user?.id) {
+      console.error("User not authenticated")
+      return []
+    }
+
+    const result = await sql `
+    SELECT 
+        p.id,
+        p.name,
+        p.price,
+        p.quantity,
+        p.description,
+        p.productImg as "productImg",
+        a.name as "seller",
+        a.id as "sellerId"
+      FROM products p
+      JOIN account a ON p.userId = a.id
+      WHERE a.id = ${user?.id}
+      `
+    if(!result[0].id){
+      return[]
+    }
+    return result || [];
+  }
+  catch(error){
+    console.error("Server error",error)
+    return []
   }
 }

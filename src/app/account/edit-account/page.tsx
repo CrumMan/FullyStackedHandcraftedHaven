@@ -1,7 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { register, getCurrentUser, updateAccount } from "@/app/lib/actions";
+import { getCurrentUser, updateAccount } from "@/app/lib/actions";
 
 export default function EditForm(){
     const router = useRouter();
@@ -102,21 +102,6 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
                 required
                 className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
               />
-            </div>
-
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-primary mb-1">
-                Account Type
-              </label>
-              <select
-                id="role"
-                name="role"
-                required
-                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
-              >
-                <option value="Buyer">Buyer</option>
-                <option value="Seller">Seller (requires approval)</option>
-              </select>
             </div>
 
             <div>
