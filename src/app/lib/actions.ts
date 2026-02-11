@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import postgres from "postgres";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { error } from "console";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -186,5 +187,45 @@ export async function getProductsByUserId(){
   catch(error){
     console.error("Server error",error)
     return []
+  }
+}
+
+export async function updateProduct(formData: FormData, product:any){
+  try{
+    await sql`
+    UPDATE products
+    SET 
+      name = ${formData.get("name") as string},
+      price = ${formData.get("price") as string},
+      quantity =  ${formData.get("quantity") as string},
+      description =  ${formData.get("description") as string},
+      productImg =  ${formData.get("imgUrl") as string}
+    where id = ${product.id}
+    `
+    return {success: true}
+  }
+  catch(error){
+    return{error: "Failed to update product"};
+  }
+}
+
+export async function createProduct(formData: FormData){
+  try{
+  const user = await getCurrentUser();
+  if (!user) return {error: "Failed to retreive user on creation"}
+  const name = formData.get("name") as string;
+  const price = formData.get("price") as string;
+  const quantity = formData.get("quantity") as string;
+  const description = formData.get("description") as string;
+  const imgUrl = formData.get("imgUrl") as string;
+  await sql `
+  INSERT into products
+  (name, price, quantity, description, productImg, userId)
+  VALUES(${name}, ${price}, ${quantity}, ${description}, ${imgUrl}, ${user.id})
+  `
+  return {success:true}
+  }
+  catch(error){
+    return{error: "Failed to Create Product"}
   }
 }

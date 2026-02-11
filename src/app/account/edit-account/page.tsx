@@ -58,6 +58,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
     return <div>Loading...</div>;
   }
     return(
+    <div className="w-1/2 mx-auto">
     <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-primary mb-1">
@@ -131,5 +132,6 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
               {loading ? "Editing..." : "Edit Account"}
             </button>
           </form>
+          </div>
     )
 }

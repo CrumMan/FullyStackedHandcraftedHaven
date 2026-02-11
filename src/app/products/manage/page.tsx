@@ -14,7 +14,7 @@ function normalizeImg(path: string | null | undefined) {
 
 export default function GetSellerProducts(){
     const router = useRouter()
-    let [products,setProducts] = useState<any[]>([]);
+    const [products,setProducts] = useState<any[]>([]);
 
     useEffect(()=> {
         const fetchProducts = async () => {
@@ -27,14 +27,16 @@ export default function GetSellerProducts(){
 
 
     return(
-        <main>
-        <Link key="create" href={`products/create`}>List A Product (Click here)<br></br><br></br></Link>
+        <main className="min-h-screen bg-white">
+        <section className="p-8">
+        <div className="max-w-6xl mx-auto">
+        <Link href={`/products/create`}>List A Product (Click here)<br></br><br></br></Link>
         <h1>Choose a Product to manage</h1>
-        {products.length > 0 && products.map((product:any)=>(
+        {products.length === 0? (<p>Loading or No Listings to display</p>) : <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{products.map((product:any)=>(
             // <Link key={product.id} href={`products/manage?id=${product.id}`}>{product.name} <br></br></Link>
             <Link
                     key={product.id}
-                    href={`/products/${product.id}`}
+                    href={`/products/manage/edit/${product.id}`}
                     className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition bg-white"
                   >
                     <div className="relative w-full h-56 bg-gray-100 overflow-hidden group">
@@ -59,8 +61,11 @@ export default function GetSellerProducts(){
                       </p>
                     </div>
                   </Link>
-        ))
+        ))}
+        </div>
         }
+        </div>
+        </section>
         </main>
     )
 
