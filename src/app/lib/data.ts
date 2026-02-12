@@ -17,7 +17,7 @@ export async function getProducts() {
         a.id as "sellerId"
       FROM products p
       JOIN account a ON p.userId = a.id
-    `;
+    `; 
     return products;
   } catch (error) {
     console.error("Database Error:", error);

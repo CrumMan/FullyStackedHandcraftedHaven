@@ -1,8 +1,6 @@
-"use client"
 import { getProductsByUserId } from "@/app/lib/actions";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import ConfirmToDeleteProduct from "./confirmationForProductDeletion";
 
 function normalizeImg(path: string | null | undefined) {
   const cleaned = (path ?? "").replace("@/public", "").trim();
@@ -12,28 +10,10 @@ function normalizeImg(path: string | null | undefined) {
   return `/${cleaned}`;
 }
 
-export default function GetSellerProducts(){
-    const router = useRouter()
-    const [products,setProducts] = useState<any[]>([]);
+export default async function GetSellerProducts(){
+    const products= await getProductsByUserId();   
 
-    useEffect(()=> {
-        const fetchProducts = async () => {
-            const data= await getProductsByUserId();
-            setProducts(data);
-        }
-        fetchProducts();
-    }, [])
-
-
-
-    return(
-        <main className="min-h-screen bg-white">
-        <section className="p-8">
-        <div className="max-w-6xl mx-auto">
-        <Link href={`/products/create`}>List A Product (Click here)<br></br><br></br></Link>
-        <h1>Choose a Product to manage</h1>
-        {products.length === 0? (<p>Loading or No Listings to display</p>) : <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{products.map((product:any)=>(
-            // <Link key={product.id} href={`products/manage?id=${product.id}`}>{product.name} <br></br></Link>
+    const manageProduct = (products.length === 0? (<p>Loading or No Listings to display</p>) : <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{products.map((product:any)=>(
             <Link
                     key={product.id}
                     href={`/products/manage/edit/${product.id}`}
@@ -63,10 +43,32 @@ export default function GetSellerProducts(){
                   </Link>
         ))}
         </div>
-        }
+    )
+    const deleteProduct = (products.length == 0 ? (
+            <p className="text-center text-primary/60">
+              No products found.
+            </p>
+          ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {products.map((product) => (
+                <ConfirmToDeleteProduct key={product.id} product={product}/>
+                ))}
+            </div>
+          ))
+
+
+
+    return(
+        <main className="min-h-screen bg-white">
+        <section className="p-8">
+        <div className="max-w-6xl mx-auto">
+        <Link href={`/products/create`}>List A Product (Click here)<br></br><br></br></Link>
+        <h1>Choose a Product to manage</h1>
+        {manageProduct}
+        <h1>Choose a Product to Delete</h1>
+        {deleteProduct}
         </div>
         </section>
         </main>
     )
-
 }
