@@ -19,6 +19,7 @@ export default async function AccountPage() {
           <Link href="./account/edit-account">Edit Account</Link>
           <br></br>
           {admin}
+          <br></br>
           {seller}
           <div className="mb-8">
           </div>

@@ -179,7 +179,7 @@ export async function getProductsByUserId(){
       JOIN account a ON p.userId = a.id
       WHERE a.id = ${user?.id}
       `
-    if(!result[0].id){
+    if(!result[0]){
       return[]
     }
     return result || [];
@@ -227,5 +227,17 @@ export async function createProduct(formData: FormData){
   }
   catch(error){
     return{error: "Failed to Create Product"}
+  }
+}
+
+export async function deleteProduct(id:string) {
+  try{
+  await sql`
+    DELETE from products 
+    WHERE id = ${id}
+  `
+  }
+  catch(error){
+    return{error:"Failed to Delete Product"}
   }
 }
