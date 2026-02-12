@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getProducts } from "@/app/lib/data";
+import { getCurrentUser, requestSellerAccount } from "@/app/lib/actions";
 
 function normalizeImg(path: string | null | undefined) {
   const cleaned = (path ?? "").replace("@/public", "").trim();
@@ -12,6 +13,13 @@ function normalizeImg(path: string | null | undefined) {
 export default async function Home() {
   const products = await getProducts();
   const featured = products.slice(0, 6);
+  const user = await getCurrentUser();
+
+  async function handleRequestSeller() {
+    "use server";
+    if (!user) return;
+    await requestSellerAccount(user.id);
+  }
 
   return (
     <main className="min-h-screen bg-white">
@@ -36,13 +44,32 @@ export default async function Home() {
                   Browse products
                 </Link>
 
-                <Link
-                  href="/register"
-                  className="border border-white px-4 py-2 rounded-md font-semibold hover:bg-white hover:text-secondary"
-                >
-                  Join as Seller
-                </Link>
+                {!user && (
+                  <Link
+                    href="/register"
+                    className="border border-white px-4 py-2 rounded-md font-semibold hover:bg-white hover:text-secondary"
+                  >
+                    Join as Seller
+                  </Link>
+                )}
+
+                {user?.role === "Buyer" && (
+                  <form action={handleRequestSeller}>
+                    <button
+                      type="submit"
+                      className="border border-white px-4 py-2 rounded-md font-semibold hover:bg-white hover:text-secondary"
+                    >
+                      Request Seller Account
+                    </button>
+                  </form>
+                )}
               </div>
+
+              {user?.role === "Seller" && !user.approved && (
+                <p className="text-sm bg-yellow-200 text-yellow-900 px-4 py-2 rounded-md">
+                  Your seller account is pending admin approval.
+                </p>
+              )}
 
               <p className="text-sm opacity-90">
                 Handmade. Curated. Delivered with care.

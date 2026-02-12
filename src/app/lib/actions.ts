@@ -114,6 +114,26 @@ export async function getCurrentUser() {
   }
 }
 
+export async function requestSellerAccount(userId: string) {
+  try {
+    const result = await sql`
+      UPDATE account
+      SET role = 'Seller', approved = false
+      WHERE id = ${userId} AND role = 'Buyer'
+      RETURNING id
+    `;
+
+    if (result.length === 0) {
+      return { error: "Invalid request" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Request seller error:", error);
+    return { error: "Failed to request seller account" };
+  }
+}
+
 export async function approveSeller(sellerId: string) {
   try {
     await sql`
