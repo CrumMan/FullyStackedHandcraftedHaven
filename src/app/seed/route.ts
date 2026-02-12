@@ -76,6 +76,13 @@ async function seedReviews(){
   )
   return insertedReviews;
 }
+async function dropSeededReviews(){
+  const text = 'worked';
+  try{
+    await sql  `DROP TABLE IF EXISTS reviews`
+  }
+  catch(error){console.log(error)}
+}
 
 async function dropSeededAccount(){
   const text = 'worked';
@@ -136,7 +143,7 @@ export async function GET() {
       // await seedProducts();
 
       // await seedReviews();
-
+      // await dropSeededReviews();
     return Response.json({ message: 'Database seeded successfully' });
     } catch (error) {
     console.log(error)

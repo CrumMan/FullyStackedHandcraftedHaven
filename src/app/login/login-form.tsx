@@ -23,11 +23,7 @@ export function LoginForm() {
       setError(result.error);
       setLoading(false);
     } else if (result.user) {
-      if (result.user.role === "Admin") {
-        router.push("/admin");
-      } else {
-        router.push("/");
-      }
+      window.location.href = '/account';
     }
   }
 
