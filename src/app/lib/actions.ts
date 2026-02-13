@@ -5,6 +5,7 @@ import postgres from "postgres";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { error } from "console";
+import { revalidatePath } from "next/cache";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -257,5 +258,26 @@ export async function deleteProduct(id:string) {
   }
   catch(error){
     return{error:"Failed to Delete Product"}
+  }
+}
+
+export async function deleteAccount(){
+  try{
+  const user = await getCurrentUser()
+  if (user == null) return
+  await sql`
+  DELETE FROM account
+  WHERE id = ${user.id}
+  `
+  await sql`
+      DELETE FROM products
+      WHERE userId = ${user.id}
+    `;
+       
+  const cookieStore = await cookies();
+    cookieStore.delete("userId");
+  }
+  catch(error){
+    return{error:"Failed to Delete Account"}
   }
 }

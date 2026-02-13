@@ -1,7 +1,7 @@
 
 import { getCurrentUser } from "../lib/actions";
 import Link from "next/link";
-
+import DeleteAccountLink from "./DeleteAccountLink";
 
 export default async function AccountPage() {
     const user = await getCurrentUser();
@@ -17,6 +17,8 @@ export default async function AccountPage() {
           </h1>
           <p className="text-primary/60 mb-8">Welcome, {user.name}</p>
           <Link href="./account/edit-account">Edit Account</Link>
+          <br></br>
+          < DeleteAccountLink />
           <br></br>
           {admin}
           <br></br>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getProducts } from "@/app/lib/data";
-import { getCurrentUser, requestSellerAccount } from "@/app/lib/actions";
+import { getCurrentUser, requestSellerAccount} from "@/app/lib/actions";
 
 function normalizeImg(path: string | null | undefined) {
   const cleaned = (path ?? "").replace("@/public", "").trim();
