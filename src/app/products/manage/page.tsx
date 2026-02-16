@@ -1,4 +1,4 @@
-import { getProductsByUserId } from "@/app/lib/actions";
+import { getProductsByUserId, getCurrentUser } from "@/app/lib/actions";
 import Link from "next/link";
 import ConfirmToDeleteProduct from "./confirmationForProductDeletion";
 
@@ -11,8 +11,10 @@ function normalizeImg(path: string | null | undefined) {
 }
 
 export default async function GetSellerProducts(){
-    const products= await getProductsByUserId();   
+    const products= await getProductsByUserId();  
+    const user = await getCurrentUser(); 
 
+    if(user == null || !user.approved){return <p>User is not loaded or approved to manage products</p>}
     const manageProduct = (products.length === 0? (<p>Loading or No Listings to display</p>) : <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{products.map((product:any)=>(
             <Link
                     key={product.id}
@@ -57,7 +59,7 @@ export default async function GetSellerProducts(){
           ))
 
 
-
+    
     return(
         <main className="min-h-screen bg-white">
         <section className="p-8">

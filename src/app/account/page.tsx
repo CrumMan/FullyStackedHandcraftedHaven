@@ -15,7 +15,7 @@ export default async function AccountPage() {
     ) : null;
 
   const seller =
-    user.role === "Seller" || user.role === "Admin" ? (
+    (user.role === "Seller" && user.approved)|| user.role === "Admin" ? (
       <Link href="/products/manage">Manage Your Products</Link>
     ) : null;
 
