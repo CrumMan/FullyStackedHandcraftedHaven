@@ -7,7 +7,7 @@ export default async function ManageProductPage(){
   if (!user) {
     return <div>Loading...</div>;
   }
-  if(user.role == "Seller" || user.role == "Admin") return(<CreateProductForm />)
+  if((user.role == "Seller" && user.approved) || user.role == "Admin") return(<CreateProductForm />)
 
     return <div className="m-auto">Please Apply to become a Seller to List an item</div>
 }
