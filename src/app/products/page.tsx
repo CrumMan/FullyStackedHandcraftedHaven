@@ -12,19 +12,10 @@ function normalizeImg(path: string | null | undefined) {
 export default async function ProductsPage() {
   const products = await getProducts();
 
-  return (
-    <main className="min-h-screen bg-white">
-      <section className="p-8">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold text-primary text-center mb-8">
-            Products
-          </h1>
-
-          {products.length === 0 ? (
+  const manage = (products.length === 0 ? (
             <p className="text-center text-primary/60">
-              No products found. Run /seed to populate the database.
-            </p>
-          ) : (
+              No products found.
+            </p>) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {products.map((product) => (
                 <Link
@@ -59,8 +50,19 @@ export default async function ProductsPage() {
                 </Link>
               ))}
             </div>
-          )}
+          ))
+    
+
+  return (
+    <main className="min-h-screen bg-white">
+      <section className="p-8">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-6xl font-bold text-primary text-center mb-8">
+            Products
+          </h1>
+          {manage}
         </div>
+
       </section>
     </main>
   );

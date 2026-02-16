@@ -1,17 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getCurrentUser } from "../lib/actions";
 
-export function Navigation() {
+export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-
-  const links = [
+  const [user, setUser] = useState<any>(null);
+  const [links, setLinks] = useState([
     { href: "/", label: "Home" },
     { href: "/products", label: "Products" },
     { href: "/login", label: "Login" },
     { href: "/register", label: "Register" },
-  ];
+  ]);
+
+  useEffect(()=>{
+    async function checkUser(){
+    const userData = await getCurrentUser();
+    setUser(userData);
+
+    if(userData){
+    setLinks([
+      { href: "/", label: "Home" },
+      { href: "/products", label: "Products" },
+      { href: "/account", label: "Account"},
+      { href: "/logout", label: "Logout" },
+    ]);
+  }
+  else {
+    setLinks([
+      { href: "/", label: "Home" },
+      { href: "/products", label: "Products" },
+      { href: "/login", label: "Login" },
+      { href: "/register", label: "Register" },
+    ]);
+  }
+    }
+    checkUser();
+  },[])
+  
+
 
   return (
     <>

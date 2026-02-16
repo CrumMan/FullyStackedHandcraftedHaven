@@ -4,16 +4,10 @@ import bcrypt from "bcryptjs";
 import postgres from "postgres";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { error } from "console";
+import { revalidatePath } from "next/cache";
 
-/** * DATABASE CONNECTION
- * This will look for the URL in your .env.local file.
- * While you are not linked to the Vercel Team, this will be undefined.
- */
-const sql = postgres(process.env.POSTGRES_URL || "", { 
-  ssl: "require",
-  // We set a short timeout so it doesn't hang your app while testing locally
-  connect_timeout: 1 
-});
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function register(formData: FormData) {
   const username = formData.get("username") as string;
@@ -105,8 +99,8 @@ export async function login(formData: FormData) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    });
+    }
+  );
 
     return { success: true, user: { id: user.id, name: user.name, role: user.role } };
   } catch (error) {
@@ -117,8 +111,9 @@ export async function login(formData: FormData) {
 export async function logout() {
   const cookieStore = await cookies();
   cookieStore.delete("userId");
-  redirect("/");
 }
+
+
 
 export async function getCurrentUser() {
   const cookieStore = await cookies();
@@ -141,6 +136,50 @@ export async function getCurrentUser() {
   }
 }
 
+export async function requestSellerAccount(userId: string) {
+  try {
+    const result = await sql`
+      UPDATE account
+      SET role = 'Seller', approved = false
+      WHERE id = ${userId} AND role = 'Buyer'
+      RETURNING id
+    `;
+
+    if (result.length === 0) {
+      return { error: "Invalid request" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Request seller error:", error);
+    return { error: "Failed to request seller account" };
+  }
+}
+export async function updateAccount(formData: FormData){
+  const user = await getCurrentUser();
+  let userId
+  if (user != null){
+    userId = user.id;
+  }
+ if (user == null){
+  return{error: 'user not authenticated'};
+ }
+  
+  try{
+    await sql`
+    UPDATE account
+    SET name = ${formData.get("name") as string}, 
+    username = ${formData.get("username") as string},
+    email = ${formData.get("email") as string},
+    bio = ${formData.get("bio") as string}
+    where id = ${userId}
+    `
+    return {success: true}
+  } catch(error){
+    return{error: "Failed to update account"};
+  }
+}
+
 export async function approveSeller(sellerId: string) {
   try {
     await sql`
@@ -152,5 +191,111 @@ export async function approveSeller(sellerId: string) {
   } catch (error) {
     console.error("Approve seller error:", error);
     return { error: "Failed to approve seller" };
+  }
+}
+
+export async function getProductsByUserId(){
+  try{
+    const user = await getCurrentUser()
+    if (!user?.id) {
+      console.error("User not authenticated")
+      return []
+    }
+
+    const result = await sql `
+    SELECT 
+        p.id,
+        p.name,
+        p.price,
+        p.quantity,
+        p.description,
+        p.productImg as "productImg",
+        a.name as "seller",
+        a.id as "sellerId"
+      FROM products p
+      JOIN account a ON p.userId = a.id
+      WHERE a.id = ${user?.id}
+      `
+    if(!result[0]){
+      return[]
+    }
+    return result || [];
+  }
+  catch(error){
+    console.error("Server error",error)
+    return []
+  }
+}
+
+export async function updateProduct(formData: FormData, product:any){
+  try{
+    await sql`
+    UPDATE products
+    SET 
+      name = ${formData.get("name") as string},
+      price = ${formData.get("price") as string},
+      quantity =  ${formData.get("quantity") as string},
+      description =  ${formData.get("description") as string},
+      productImg =  ${formData.get("imgUrl") as string}
+    where id = ${product.id}
+    `
+    return {success: true}
+  }
+  catch(error){
+    return{error: "Failed to update product"};
+  }
+}
+
+export async function createProduct(formData: FormData){
+  try{
+  const user = await getCurrentUser();
+  if (!user) return {error: "Failed to retreive user on creation"}
+  const name = formData.get("name") as string;
+  const price = formData.get("price") as string;
+  const quantity = formData.get("quantity") as string;
+  const description = formData.get("description") as string;
+  const imgUrl = formData.get("imgUrl") as string;
+  await sql `
+  INSERT into products
+  (name, price, quantity, description, productImg, userId)
+  VALUES(${name}, ${price}, ${quantity}, ${description}, ${imgUrl}, ${user.id})
+  `
+  return {success:true}
+  }
+  catch(error){
+    return{error: "Failed to Create Product"}
+  }
+}
+
+export async function deleteProduct(id:string) {
+  try{
+  await sql`
+    DELETE from products 
+    WHERE id = ${id}
+  `
+  }
+  catch(error){
+    return{error:"Failed to Delete Product"}
+  }
+}
+
+export async function deleteAccount(){
+  try{
+  const user = await getCurrentUser()
+  if (user == null) return
+  await sql`
+  DELETE FROM account
+  WHERE id = ${user.id}
+  `
+  await sql`
+      DELETE FROM products
+      WHERE userId = ${user.id}
+    `;
+       
+  const cookieStore = await cookies();
+    cookieStore.delete("userId");
+  }
+  catch(error){
+    return{error:"Failed to Delete Account"}
   }
 }
