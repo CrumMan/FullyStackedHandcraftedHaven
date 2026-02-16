@@ -41,12 +41,12 @@ export default async function AccountPage() {
                   const userId = formData.get("userId") as string;
                   await requestSellerAccount(userId);
                 }}
-                className="mt-4"
+                className="bg-secondary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity text-center"
               >
                 <input type="hidden" name="userId" value={user.id} />
                 <button
                   type="submit"
-                  className="bg-secondary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                  className="bg-secondary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity text-center "
                 >
                   Request Seller Account
                 </button>
