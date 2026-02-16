@@ -53,7 +53,7 @@ export async function getProductById(id: string) {
 export async function getSellerById(id: string) {
   try {
     const sellers = await sql`
-      SELECT id, username, name, email, role, bio, userPhoto, approved
+      SELECT id, username, name, email, role, bio, userPhoto, approved, userimg
       FROM account
       WHERE id = ${id}
     `;
@@ -115,5 +115,25 @@ export async function getPendingSellers() {
   } catch (error) {
     console.error("Database Error:", error);
     return [];
+  }
+}
+export async function getReviewInfo(id:string) {
+  try{
+    const result = await sql `
+    SELECT
+    r.id,
+    r.userId,
+    r.productId,
+    r.author,
+    r.rating,
+    r.comment
+    FROM reviews r
+    where (r.productId = ${id});
+    `;
+    if(result) return result;
+    else return null
+  }
+  catch(error){
+    console.error("Database Error: ", error)
   }
 }

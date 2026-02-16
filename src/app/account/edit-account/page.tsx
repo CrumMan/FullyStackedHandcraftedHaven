@@ -14,7 +14,8 @@ const [formData,setFormData] = useState({
     username:"",
     name:"",
     email:"",
-    bio:""
+    bio:"",
+    userimg:""
 })
 useEffect(() =>{
     async function fetchUser() {
@@ -25,7 +26,9 @@ useEffect(() =>{
                 username: userData.username || "",
                 name: userData.name || "",
                 email: userData.email || "",
-                bio: userData.bio || ""
+                bio: userData.bio || "",
+                userimg: userData.userimg || "",
+                
             })
         }
     }
@@ -106,6 +109,21 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
             </div>
 
             <div>
+              <label htmlFor="userimg" className="block text-sm font-medium text-primary mb-1">
+                User Image
+              </label>
+             <input
+                type="text"
+                id="userimg"
+                name="userimg"
+                value={formData.userimg}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
+              />
+            </div>
+
+            <div>
               <label htmlFor="bio" className="block text-sm font-medium text-primary mb-1">
                 Bio (optional)
               </label>
@@ -119,6 +137,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
 
               />
             </div>
+            
 
             {error && (
               <p className="text-red-600 text-sm">{error}</p>

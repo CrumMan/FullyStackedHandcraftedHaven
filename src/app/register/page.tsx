@@ -107,6 +107,20 @@ export default function RegisterPage() {
             </div>
 
             <div>
+              <label htmlFor="userimg" className="block text-sm font-medium text-primary mb-1">
+                User Image
+              </label>
+              <input
+                type="text"
+                id="userimg"
+                name="userimg"
+                required
+                minLength={6}
+                className="w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:border-secondary"
+              />
+            </div>
+            
+            <div>
               <label htmlFor="bio" className="block text-sm font-medium text-primary mb-1">
                 Bio (optional)
               </label>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getProductById } from "@/app/lib/data";
+import { getProductById, getReviewInfo } from "@/app/lib/data";
 import { notFound } from "next/navigation";
 import postgres from "postgres";
 
@@ -41,18 +41,8 @@ export default async function ProductPage({
 //     LIMIT 6;
 //   `;
 
-  const reviews = await sql `
-   SELECT
-    r.id,
-    r.userId,
-    r.productId,
-    r.author,
-    r.rating,
-    r.comment
-  FROM reviews r
-  where (r.productId = ${id});
-  `;
-  
+  const reviews = await getReviewInfo(id);
+
 
   // placeholder reviews for now
   // const review = [
@@ -125,8 +115,7 @@ export default async function ProductPage({
         <div className="max-w-6xl mx-auto">
           <div className="rounded-lg p-6 border border-primary/10">
             <h2 className="text-xl font-bold text-primary mb-4">Reviews</h2>
-
-            {reviews.length > 0 ? (
+            {reviews && reviews.length > 0 ? (
               <div className="space-y-4">
                 {reviews.map((review) => (
                   <div
@@ -148,6 +137,7 @@ export default async function ProductPage({
             ) : (
               <p className="text-primary/60">No reviews yet.</p>
             )}
+             <Link  className="text-xl font-bold text-primary mb-4" href={`/products/review/${id}`}>Review Product</Link>
           </div>
         </div>
       </section>

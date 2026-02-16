@@ -23,14 +23,14 @@ export default async function SellerPage({
   }
 
   const products = await getProductsBySeller(id);
-
+  const sellerImg = (seller.userimg != null)? <img className="max-h-80" src={normalizeImg(seller.userimg)} />: <span className="text-white">Seller Photo</span>;
   return (
     <main className="min-h-screen bg-white">
       <section className="p-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <div className="bg-secondary rounded-lg min-h-80 flex items-center justify-center">
-              <span className="text-white">Seller Photo</span>
+              {sellerImg}
             </div>
 
             <div className="text-primary">

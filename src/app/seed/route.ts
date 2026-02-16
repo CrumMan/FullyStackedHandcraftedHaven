@@ -133,6 +133,18 @@ async function seedAccount() {
   return insertedUsers;
 }
 
+async function alterAccount(){
+  return sql`ALTER TABLE IF EXISTS account
+              ADD COLUMN IF NOT EXISTS userimg text
+  `
+}
+
+async function alterUserImg(){
+  return sql `ALTER TABLE IF EXISTS account 
+              ALTER COLUMN userimg TYPE TEXT
+  `
+}
+
 export async function GET() {
   try {
     console.log("POSTGRES_URL:", process.env.POSTGRES_URL);  
@@ -144,6 +156,9 @@ export async function GET() {
 
       // await seedReviews();
       // await dropSeededReviews();
+
+      // await alterAccount();
+      await alterUserImg()
     return Response.json({ message: 'Database seeded successfully' });
     } catch (error) {
     console.log(error)

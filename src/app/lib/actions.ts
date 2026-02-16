@@ -16,6 +16,7 @@ export async function register(formData: FormData) {
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
   const bio = formData.get("bio") as string;
+  const userimg = formData.get("userimg") as string;
 
   if (!username || !name || !email || !password || !role) {
     return { error: "All fields are required" };
@@ -34,8 +35,8 @@ export async function register(formData: FormData) {
     const approved = role === "Buyer";
 
     await sql`
-      INSERT INTO account (username, name, email, password, role, bio, approved)
-      VALUES (${username}, ${name}, ${email}, ${hashedPassword}, ${role}, ${bio || ""}, ${approved})
+      INSERT INTO account (username, name, email, password, role, bio, approved, userimg)
+      VALUES (${username}, ${name}, ${email}, ${hashedPassword}, ${role}, ${bio || ""}, ${approved}, ${userimg || ""})
     `;
 
     return { success: true };
@@ -107,7 +108,7 @@ export async function getCurrentUser() {
 
   try {
     const users = await sql`
-      SELECT id, username, name, email, role, bio, userPhoto, approved
+      SELECT id, username, name, email, role, bio, userPhoto, approved, userimg
       FROM account
       WHERE id = ${userId}
     `;
@@ -153,7 +154,8 @@ export async function updateAccount(formData: FormData){
     SET name = ${formData.get("name") as string}, 
     username = ${formData.get("username") as string},
     email = ${formData.get("email") as string},
-    bio = ${formData.get("bio") as string}
+    bio = ${formData.get("bio") as string},
+    userimg = ${formData.get("userimg")as string}
     where id = ${userId}
     `
     return {success: true}
@@ -279,5 +281,20 @@ export async function deleteAccount(){
   }
   catch(error){
     return{error:"Failed to Delete Account"}
+  }
+}
+export async function createReview(formData: FormData, id:string){
+  try{
+    const user = await getCurrentUser();
+    if(!user){throw new Error("User not found")}
+    await sql `
+    INSERT INTO reviews (userId, productId, comment, rating, author)
+    VALUES(${user.id}, ${id}, ${formData.get("comment")as string}, ${Number(formData.get("rating"))}, ${user.name})
+    `
+    return { success: true };
+  }
+
+  catch(error){
+    return{error:"Failed to Create Review"}
   }
 }
