@@ -64,10 +64,12 @@ export default async function GetSellerProducts(){
         <main className="min-h-screen bg-white">
         <section className="p-8">
         <div className="max-w-6xl mx-auto">
-        <Link href={`/products/create`}>List A Product (Click here)<br></br><br></br></Link>
-        <h1>Choose a Product to manage</h1>
+        <div className="text-center mb-6">
+        <Link className="inline-block bg-secondary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity" href={`/products/create`}>List a Product</Link>
+        </div>
+        <h1 className="text-center">Choose a Product to manage</h1>
         {manageProduct}
-        <h1>Choose a Product to Delete</h1>
+        <h1 className="text-center">Choose a Product to Delete</h1>
         {deleteProduct}
         </div>
         </section>
