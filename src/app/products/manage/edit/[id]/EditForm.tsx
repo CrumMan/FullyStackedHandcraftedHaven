@@ -129,7 +129,7 @@ export default function EditForm({product}: {product:any}){
               disabled={loading}
               className="w-full bg-secondary text-white py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {loading ? "Editing..." : "Edit Account"}
+              {loading ? "Editing..." : "Edit Product"}
             </button>
           </form>
           </div>

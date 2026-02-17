@@ -25,6 +25,30 @@ export async function getProducts() {
   }
 }
 
+export async function getFeatured() {
+  try {
+    const products = await sql`
+      SELECT 
+        p.id,
+        p.name,
+        p.price,
+        p.quantity,
+        p.description,
+        p.productImg as "productImg",
+        a.name as "seller",
+        a.id as "sellerId"
+      FROM products p
+      JOIN account a ON p.userId = a.id
+      ORDER BY p.quantity ASC
+      LIMIT 6
+    `; 
+    return products;
+  } catch (error) {
+    console.error("Database Error:", error);
+    return [];
+  }
+}
+
 // fetch single product by id
 export async function getProductById(id: string) {
   try {

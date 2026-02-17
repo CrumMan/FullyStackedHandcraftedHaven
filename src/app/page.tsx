@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getProducts } from "@/app/lib/data";
+import { getFeatured } from "@/app/lib/data";
 import { getCurrentUser, requestSellerAccount} from "@/app/lib/actions";
 
 function normalizeImg(path: string | null | undefined) {
@@ -11,7 +11,7 @@ function normalizeImg(path: string | null | undefined) {
 }
 
 export default async function Home() {
-  const products = await getProducts();
+  const products = await getFeatured();
   const featured = products.slice(0, 6);
   const user = await getCurrentUser();
 

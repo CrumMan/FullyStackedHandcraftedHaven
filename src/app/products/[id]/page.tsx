@@ -2,9 +2,7 @@ import Link from "next/link";
 import { getProductById, getReviewInfo } from "@/app/lib/data";
 import { notFound } from "next/navigation";
 import postgres from "postgres";
-
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
+import { getCurrentUser } from "@/app/lib/actions";
 
 function normalizeImg(path: string | null | undefined) {
   const cleaned = (path ?? "").replace("@/public", "").trim();
@@ -21,7 +19,8 @@ export default async function ProductPage({
 }) {
   const { id } = await params;
   const product = await getProductById(id);
-
+  const user = await getCurrentUser()
+  if(!user) notFound();
   if (!product) {
     notFound();
   }
@@ -42,7 +41,16 @@ export default async function ProductPage({
 //   `;
 
   const reviews = await getReviewInfo(id);
-
+  const deleteButton = function(review:any){
+                      if(user.id == review.userId || user.role == "Admin")
+                      {return(
+                      <Link  className="inline-block mt-2 text-red-500 hover:underline text-sm" href={`/products/review/delete/${review.id}`}>
+                      <button>Delete</button>
+                      </Link>
+                    )}
+                    return null;
+  }
+                      
 
   // placeholder reviews for now
   // const review = [
@@ -126,11 +134,17 @@ export default async function ProductPage({
                       <span className="font-medium text-primary">
                         {review.author}
                       </span>
-                      <span className="text-primary/60">
-                        {review.rating}/5 stars
-                      </span>
+                    <span className="text-right">
+                      {deleteButton(review)}
+                    </span>
                     </div>
-                    <p className="text-primary/80">{review.comment}</p>
+                    <div className="flex justify-between mb-1">
+                    <p className="text-primary/80">{review.comment}
+                    </p>
+                      <div className="text-right">
+                        {review.rating}/5 stars
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

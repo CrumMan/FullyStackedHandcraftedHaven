@@ -15,7 +15,7 @@ export default async function GetSellerProducts(){
     const user = await getCurrentUser(); 
 
     if(user == null || !user.approved){return <p>User is not loaded or approved to manage products</p>}
-    const manageProduct = (products.length === 0? (<p>Loading or No Listings to display</p>) : <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{products.map((product:any)=>(
+    const manageProduct = (products.length === 0? (<p className="text-center text-primary/60"> No Listings to display</p>) : <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{products.map((product:any)=>(
             <Link
                     key={product.id}
                     href={`/products/manage/edit/${product.id}`}
