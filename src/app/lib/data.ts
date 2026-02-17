@@ -161,3 +161,33 @@ export async function getReviewInfo(id:string) {
     console.error("Database Error: ", error)
   }
 }
+
+// Fetch single review by id
+export async function getReviewById(reviewId: string) {
+  try {
+    const result = await sql`
+      SELECT r.id, r.userId, r.productId, r.author, r.rating, r.comment
+      FROM reviews r
+      WHERE r.id = ${reviewId}
+    `;
+    return result[0] || null;
+  } catch (error) {
+    console.error("Database Error:", error);
+    return null;
+  }
+}
+
+// Fetch all accounts for admin management
+export async function getAllAccounts() {
+  try {
+    const accounts = await sql`
+      SELECT id, username, name, email, role, approved, createdAt
+      FROM account
+      ORDER BY createdAt DESC
+    `;
+    return accounts;
+  } catch (error) {
+    console.error("Database Error:", error);
+    return [];
+  }
+}

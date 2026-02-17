@@ -65,22 +65,20 @@ const products = [
 ];
 
 const reviews = [
- { 
-  id: 'd696e808-347c-4ec3-9831-9d3342e62997',
-  userId:'550e8400-e29b-41d4-a716-446655440001',
-  productId:'3f2c8e9b-7a4d-4d6c-b9f2-6e1b0d4a8c21',
-  comment: 'Beautiful craftsmanship! Exactly as described.',
-  rating: 4,
- },
- {
-  id: 'dcd4cca0-e2af-4795-8464-48b01c27b5eb',
-  userId:'550e8400-e29b-41d4-a716-446655440002',
-  productId:'3f2c8e9b-7a4d-4d6c-b9f2-6e1b0d4a8c21',
-  comment: 'Great quality, shipping was fast.',
-  rating: 5,
- }
+  {
+    id: "d696e808-347c-4ec3-9831-9d3342e62997",
+    userId: "550e8400-e29b-41d4-a716-446655440001",
+    productId: "3f2c8e9b-7a4d-4d6c-b9f2-6e1b0d4a8c21",
+    comment: "Beautiful craftsmanship! Exactly as described.",
+    rating: 4,
+  },
+  {
+    id: "dcd4cca0-e2af-4795-8464-48b01c27b5eb",
+    userId: "550e8400-e29b-41d4-a716-446655440002",
+    productId: "3f2c8e9b-7a4d-4d6c-b9f2-6e1b0d4a8c21",
+    comment: "Great quality, shipping was fast.",
+    rating: 5,
+  },
+];
 
-]
-
-
-export {users, products, reviews};
+export { users, products, reviews };

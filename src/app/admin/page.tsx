@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, approveSeller } from "../lib/actions";
-import { getPendingSellers } from "../lib/data";
+import { getPendingSellers, getAllAccounts } from "../lib/data";
+import { DeleteAccountButton } from "./delete-account-button";
 
 export default async function AdminPage() {
   const user = await getCurrentUser();
@@ -10,6 +11,7 @@ export default async function AdminPage() {
   }
 
   const pendingSellers = await getPendingSellers();
+  const allAccounts = await getAllAccounts();
 
   async function handleApprove(formData: FormData) {
     "use server";
@@ -27,7 +29,8 @@ export default async function AdminPage() {
           </h1>
           <p className="text-primary/60 mb-8">Welcome, {user.name}</p>
 
-          <div className="mb-8">
+          {/* Pending Seller Approvals */}
+          <div className="mb-12">
             <h2 className="text-xl font-semibold text-primary mb-4">
               Pending Seller Approvals
             </h2>
@@ -63,6 +66,103 @@ export default async function AdminPage() {
                     </form>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* All Accounts Management */}
+          <div>
+            <h2 className="text-xl font-semibold text-primary mb-4">
+              Manage Accounts
+            </h2>
+
+            {allAccounts.length === 0 ? (
+              <p className="text-primary/60 bg-primary/5 p-4 rounded-lg">
+                No accounts found.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full border border-primary/10 rounded-lg">
+                  <thead className="bg-primary/5">
+                    <tr>
+                      <th className="text-left p-3 text-sm font-medium text-primary">
+                        Name
+                      </th>
+                      <th className="text-left p-3 text-sm font-medium text-primary">
+                        Email
+                      </th>
+                      <th className="text-left p-3 text-sm font-medium text-primary">
+                        Role
+                      </th>
+                      <th className="text-left p-3 text-sm font-medium text-primary">
+                        Status
+                      </th>
+                      <th className="text-right p-3 text-sm font-medium text-primary">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allAccounts.map((account) => (
+                      <tr
+                        key={account.id}
+                        className="border-t border-primary/10"
+                      >
+                        <td className="p-3">
+                          <p className="font-medium text-primary">
+                            {account.name}
+                          </p>
+                          <p className="text-xs text-primary/60">
+                            @{account.username}
+                          </p>
+                        </td>
+                        <td className="p-3 text-sm text-primary/80">
+                          {account.email}
+                        </td>
+                        <td className="p-3">
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              account.role === "Admin"
+                                ? "bg-purple-100 text-purple-800"
+                                : account.role === "Seller"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {account.role}
+                          </span>
+                        </td>
+                        <td className="p-3">
+                          {account.role === "Seller" ? (
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                account.approved
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              {account.approved ? "Approved" : "Pending"}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-primary/40">—</span>
+                          )}
+                        </td>
+                        <td className="p-3 text-right">
+                          {account.id !== user.id ? (
+                            <DeleteAccountButton
+                              accountId={account.id}
+                              accountName={account.name}
+                            />
+                          ) : (
+                            <span className="text-xs text-primary/40">
+                              (You)
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>

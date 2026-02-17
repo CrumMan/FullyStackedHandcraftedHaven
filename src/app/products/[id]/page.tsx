@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getProductById, getReviewInfo } from "@/app/lib/data";
 import { notFound } from "next/navigation";
-import postgres from "postgres";
 import { getCurrentUser } from "@/app/lib/actions";
 
 function normalizeImg(path: string | null | undefined) {
@@ -19,54 +18,19 @@ export default async function ProductPage({
 }) {
   const { id } = await params;
   const product = await getProductById(id);
-  const user = await getCurrentUser()
-  if(!user) notFound();
+  const user = await getCurrentUser();
+
   if (!product) {
     notFound();
   }
-// export default async function Home() {
-//   const rows = await sql`
-//     SELECT
-//       p.id,
-//       p.name,
-//       p.price,
-//       p.quantity,
-//       p.description,
-//       p.productimg,
-//       a.name as "sellerName"
-//     FROM products p
-//     JOIN account a ON a.id = p.userid
-//     ORDER BY p.name ASC
-//     LIMIT 6;
-//   `;
 
   const reviews = await getReviewInfo(id);
-  const deleteButton = function(review:any){
-                      if(user.id == review.userId || user.role == "Admin")
-                      {return(
-                      <Link  className="inline-block mt-2 text-red-500 hover:underline text-sm" href={`/products/review/delete/${review.id}`}>
-                      <button>Delete</button>
-                      </Link>
-                    )}
-                    return null;
-  }
-                      
 
-  // placeholder reviews for now
-  // const review = [
-  //   {
-  //     id: "1",
-  //     author: "Customer A",
-  //     rating: 5,
-  //     comment: "Beautiful craftsmanship! Exactly as described.",
-  //   },
-  //   {
-  //     id: "2",
-  //     author: "Customer B",
-  //     rating: 4,
-  //     comment: "Great quality, shipping was fast.",
-  //   },
-  // ];
+  // Show delete button only if user is logged in and owns review or is admin
+  function canDeleteReview(review: Record<string, unknown>) {
+    if (!user) return false;
+    return user.id === review.userid || user.role === "Admin";
+  }
 
   return (
     <main className="min-h-screen bg-white">
@@ -134,14 +98,20 @@ export default async function ProductPage({
                       <span className="font-medium text-primary">
                         {review.author}
                       </span>
-                    <span className="text-right">
-                      {deleteButton(review)}
-                    </span>
+                      <span className="text-right">
+                        {canDeleteReview(review) && (
+                          <Link
+                            className="text-red-500 hover:underline text-sm"
+                            href={`/products/review/delete/${review.id}`}
+                          >
+                            Delete
+                          </Link>
+                        )}
+                      </span>
                     </div>
                     <div className="flex justify-between mb-1">
-                    <p className="text-primary/80">{review.comment}
-                    </p>
-                      <div className="text-right">
+                      <p className="text-primary/80">{review.comment}</p>
+                      <div className="text-right text-primary/60">
                         {review.rating}/5 stars
                       </div>
                     </div>
@@ -151,7 +121,22 @@ export default async function ProductPage({
             ) : (
               <p className="text-primary/60">No reviews yet.</p>
             )}
-             <Link  className="text-xl font-bold text-primary mb-4" href={`/products/review/${id}`}>Review Product</Link>
+
+            {user ? (
+              <Link
+                className="inline-block mt-4 text-secondary hover:underline"
+                href={`/products/review/${id}`}
+              >
+                Write a Review
+              </Link>
+            ) : (
+              <p className="mt-4 text-sm text-primary/60">
+                <Link href="/login" className="text-secondary hover:underline">
+                  Log in
+                </Link>{" "}
+                to write a review.
+              </p>
+            )}
           </div>
         </div>
       </section>

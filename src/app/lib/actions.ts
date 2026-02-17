@@ -4,8 +4,6 @@ import bcrypt from "bcryptjs";
 import postgres from "postgres";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { error } from "console";
-import { revalidatePath } from "next/cache";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -296,5 +294,111 @@ export async function createReview(formData: FormData, id:string){
 
   catch(error){
     return{error:"Failed to Create Review"}
+  }
+}
+
+// Delete a review - user can only delete their own, admin can delete any
+export async function deleteReview(reviewId: string) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { error: "Not authenticated" };
+    }
+
+    // Check if review exists and get its owner
+    const reviews = await sql`
+      SELECT id, userId FROM reviews WHERE id = ${reviewId}
+    `;
+
+    if (reviews.length === 0) {
+      return { error: "Review not found" };
+    }
+
+    const review = reviews[0];
+
+    // Only allow deletion if user owns the review or is admin
+    if (review.userid !== user.id && user.role !== "Admin") {
+      return { error: "You can only delete your own reviews" };
+    }
+
+    await sql`DELETE FROM reviews WHERE id = ${reviewId}`;
+    return { success: true };
+  } catch (error) {
+    console.error("Delete review error:", error);
+    return { error: "Failed to delete review" };
+  }
+}
+
+// Admin: delete any account
+export async function adminDeleteAccount(accountId: string) {
+  try {
+    const user = await getCurrentUser();
+    if (!user || user.role !== "Admin") {
+      return { error: "Admin access required" };
+    }
+
+    // Prevent admin from deleting themselves
+    if (accountId === user.id) {
+      return { error: "Cannot delete your own admin account" };
+    }
+
+    // Products will cascade delete due to FK constraint
+    await sql`DELETE FROM account WHERE id = ${accountId}`;
+    return { success: true };
+  } catch (error) {
+    console.error("Admin delete account error:", error);
+    return { error: "Failed to delete account" };
+  }
+}
+
+// Change password - requires current password verification
+export async function changePassword(formData: FormData) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { error: "Not authenticated" };
+    }
+
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return { error: "All fields are required" };
+    }
+
+    if (newPassword !== confirmPassword) {
+      return { error: "New passwords do not match" };
+    }
+
+    if (newPassword.length < 6) {
+      return { error: "Password must be at least 6 characters" };
+    }
+
+    // Get current hashed password from DB
+    const accounts = await sql`
+      SELECT password FROM account WHERE id = ${user.id}
+    `;
+
+    if (accounts.length === 0) {
+      return { error: "Account not found" };
+    }
+
+    // Verify current password
+    const isValid = await bcrypt.compare(currentPassword, accounts[0].password);
+    if (!isValid) {
+      return { error: "Current password is incorrect" };
+    }
+
+    // Hash and save new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await sql`
+      UPDATE account SET password = ${hashedPassword} WHERE id = ${user.id}
+    `;
+
+    return { success: true };
+  } catch (error) {
+    console.error("Change password error:", error);
+    return { error: "Failed to change password" };
   }
 }

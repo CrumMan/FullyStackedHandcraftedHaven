@@ -30,6 +30,7 @@ export default async function AccountPage() {
           <p className="text-primary/60 mb-8">Welcome, {user.name}</p>
           <div className="flex flex-col gap-4">
             <Link className="bg-secondary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity text-center" href="./account/edit-account">Edit Account</Link>
+            <Link className="bg-secondary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity text-center" href="./account/change-password">Change Password</Link>
             {admin}
             {seller}
             {/* Buyer Request Button */}
